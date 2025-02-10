@@ -10,8 +10,20 @@ class AccessControlSystem {
         this.logger = logger;
     }
 
-    public void createCard(String cardId, LocalDateTime expiration) {
-        cards.put(cardId, new StandardAccessCard(cardId, expiration));
+    public void createCard(String cardId, LocalDateTime expiration, String cardType) {
+        switch (cardType) {
+            case "Standard":
+                cards.put(cardId, new StandardAccessCard(cardId, expiration));
+                break;
+            case "VIP":
+                cards.put(cardId, new VIPAccessCard(cardId, expiration));
+                break;
+            case "Guest":
+                cards.put(cardId, new GuestAccessCard(cardId, expiration));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown card type");
+        }
         logger.logModification("Created", cardId);
     }
 
@@ -27,6 +39,8 @@ class AccessControlSystem {
                 if (room != null) standardCard.revokeRoomAccess(room);
             }
             logger.logModification("Modified", cardId);
+        } else {
+            logger.logModification("Modification not allowed for " + card.getClass().getSimpleName(), cardId);
         }
     }
 
